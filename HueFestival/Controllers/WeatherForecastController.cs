@@ -4,6 +4,7 @@ namespace HueFestival.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+//https://localhost:7017/WeatherForecast/GetWeatherForecast
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -29,5 +30,11 @@ public class WeatherForecastController : ControllerBase
         })
         .ToArray();
     }
+    [HttpGet("heloo")]
+    public IActionResult SayHello()
+    {
+        return Ok("Hello World");
+    }
+
 }
 
