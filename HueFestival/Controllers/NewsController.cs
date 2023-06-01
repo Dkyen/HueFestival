@@ -31,7 +31,6 @@ namespace HueFestival.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Tạo ID cho tin tức mới (có thể sử dụng các thuật toán phù hợp)
             news.NewsId = NewsList.Count + 1;
             news.CreatedAt = DateTime.Now;
 

@@ -2,9 +2,6 @@
 
 namespace HueFestival.Controllers;
 
-
-
-
 public class Program
 {
     public int ProgramId { get; set; }
