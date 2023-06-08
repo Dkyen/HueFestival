@@ -1,19 +1,21 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HueFestival.Controllers;
 
-	
+namespace HueFestival.Models
+{
+    [Table("TicketLocation")]
     public class TicketLocation
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int TicketLocationId { get; set; }
 
         [Required]
-        [StringLength(255)]
         public string? TicketLocationName { get; set; }
 
         [Required]
-        [StringLength(255)]
         public string? Address { get; set; }
 
         [Required]
@@ -21,10 +23,6 @@ namespace HueFestival.Controllers;
         public string? PhoneNumber { get; set; }
 
         [Required]
-        [StringLength(255)]
         public string? Image { get; set; }
     }
-
-
-
-
+}

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using HueFestival.Models;
+
 
 
 namespace HueFestival.Controllers
@@ -11,15 +13,15 @@ namespace HueFestival.Controllers
     [ApiController]
     public class ProgramController : ControllerBase
     {
-        private static List<Program> ProgramList = new List<Program>
+        private static List<Programme> ProgramList = new List<Programme>
         {
-            new Program { ProgramId = 1, ProgramName = "Program 1", Content = "Chuong trinh 1", TypeProgram = 1 },
-            new Program { ProgramId = 2, ProgramName = "Program 2", Content = "Chuong trinh 2", TypeProgram = 2 },
+            new Programme { ProgramId = 1, ProgramName = "Program 1", Content = "Chuong trinh 1", TypeProgram = 1 },
+            new Programme { ProgramId = 2, ProgramName = "Program 2", Content = "Chuong trinh 2", TypeProgram = 2 },
             // Thêm các dữ liệu tạm thời khác
         };
 
         [HttpPost("Add")]
-        public IActionResult Add(Program program)
+        public IActionResult Add(Programme programme)
         {
             // Kiểm tra dữ liệu hợp lệ
             if (!ModelState.IsValid)
@@ -28,10 +30,10 @@ namespace HueFestival.Controllers
             }
 
             
-            program.ProgramId = ProgramList.Count + 1;
+            programme.ProgramId = ProgramList.Count + 1;
 
             // Thêm chương trình vào danh sách tạm thời
-            ProgramList.Add(program);
+            ProgramList.Add(programme);
 
             // Trả về thông báo thành công
             return Ok("Successfully");
@@ -85,7 +87,7 @@ namespace HueFestival.Controllers
         }
 
         [HttpPut("Edit")]
-        public IActionResult Edit(int id, Program updatedProgram)
+        public IActionResult Edit(int id, Programme updatedProgram)
         {
             // Kiểm tra dữ liệu hợp lệ
             if (!ModelState.IsValid)

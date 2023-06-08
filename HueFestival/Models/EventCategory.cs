@@ -2,25 +2,19 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace HueFestival.Models
 {
-    [Table("News")]
-    public class News
+    [Table("EventCategory")]
+    public class EventCategory
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int NewsId { get; set; }
+        public int EventCategoryId { get; set; }
 
         [Required]
-        public string? Title { get; set; }
+        public string? EventName { get; set; }
 
-        [Required]
         public string? Content { get; set; }
-
-        [Required]
-        public string? Image { get; set; }
-
-        [Required]
-        public DateTime CreatedAt { get; set; }
     }
 }
