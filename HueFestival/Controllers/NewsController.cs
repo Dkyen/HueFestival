@@ -1,97 +1,85 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using HueFestival.Data;
 using HueFestival.Models;
-
+using HueFestival.Data;
+using HueFestival.Repositories;
+using HueFestival.ViewModel;
 namespace HueFestival.Controllers
-
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class NewsController : ControllerBase
     {
-        private static List<News> NewsList = new List<News>
-        {
-            new News { NewsId = 1, Title = "News 1", Content = "Noi dung 1", Image = "image1.jpg", CreatedAt = DateTime.Now },
-            new News { NewsId = 2, Title = "News 2", Content = "Noi dung 2", Image = "image2.jpg", CreatedAt = DateTime.Now },
-            // Thêm các dữ liệu tạm thời khác
-        };
+        private readonly INewsRepository _newsrepo;
 
-        [HttpGet("GetAll")]
-        public IActionResult GetAll()
+        public NewsController(INewsRepository repo)
         {
-            return Ok(NewsList);
+            _newsrepo = repo;
         }
 
-        [HttpPost("Add")]
-        public IActionResult Add(News news)
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllNewsAsyn()
         {
-            // Kiểm tra dữ liệu hợp lệ
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                return Ok(await _newsrepo.GetAllNewsAsyn());
+
             }
-
-            news.NewsId = NewsList.Count + 1;
-            news.CreatedAt = DateTime.Now;
-
-            // Thêm tin tức vào danh sách tạm thời
-            NewsList.Add(news);
-
-            return Ok("Successfully");
+            catch
+            {
+                return BadRequest();
+            }
         }
 
-        [HttpDelete("Delete")]
-        public IActionResult Delete(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetNewsById(int id)
         {
-            var news = NewsList.Find(n => n.NewsId == id);
+            var news = await _newsrepo.GetNewsAsyn(id);
+
             if (news == null)
             {
                 return NotFound();
             }
 
-            NewsList.Remove(news);
-
-            return Ok("Delete Successfully");
+            return Ok( news);
         }
-
-        [HttpGet("Details")]
-        public IActionResult Details(int id)
+        [HttpPost]
+        public async Task<IActionResult> AddNewAbout(NewsViewModel model)
         {
-            var news = NewsList.Find(n => n.NewsId == id);
-            if (news != null)
+            try
             {
-                return Ok(news);
-            }
 
-            return NotFound();
+                var newNewsId = await _newsrepo.AddNewsAsyn(model);
+                var news = await _newsrepo.GetNewsAsyn(newNewsId);
+                return news == null ? NotFound() : Ok(news);
+
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
-
-        [HttpPut("Edit")]
-        public IActionResult Edit(int id, News updatedNews)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateNews(int id, NewsViewModel model)
         {
-            // Kiểm tra dữ liệu hợp lệ
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var news = NewsList.Find(n => n.NewsId == id);
-            if (news == null)
+            if (id != model.NewsId)
             {
                 return NotFound();
             }
-
-            news.Title = updatedNews.Title;
-            news.Content = updatedNews.Content;
-            news.Image = updatedNews.Image;
-
-            return Ok("Edit Successfully");
+            await _newsrepo.UpdateNewsAsyn(id, model);
+            return Ok();
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNews([FromRoute] int id)
+        {
+            await _newsrepo.DeleteNewsAsyn(id);
+            return Ok();
+
+        }
+
     }
-
-   
 }

@@ -1,77 +1,84 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-
+using HueFestival.Models;
+using HueFestival.Data;
+using HueFestival.Repositories;
+using HueFestival.ViewModel;
 namespace HueFestival.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
-    public class AboutController : Controller
+    public class AboutController : ControllerBase
     {
-        private static List<string> AboutList = new List<string>
-        {
-            "About 1",
-            "About 2"
-            // Thêm các dữ liệu tạm thời khác
-        };
+        private readonly IAboutRepository _aboutrepo;
 
-        // GET: api/about
+        public AboutController(IAboutRepository repo)
+        {
+            _aboutrepo = repo;
+        }
+
+
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> GetAllAbouts()
         {
-            return Ok(AboutList);
+            try
+            {
+                return Ok(await _aboutrepo.GetAllAboutsAsyn());
+
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
-        // GET api/about/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> GetAboutById(int id)
         {
-            if (id >= 0 && id < AboutList.Count)
+            var about = await _aboutrepo.GetAboutsAsyn(id);
+
+            if (about == null)
             {
-                return Ok(AboutList[id]);
+                return NotFound();
             }
 
-            return NotFound();
+            return Ok(about);
         }
-
-        // POST api/about
         [HttpPost]
-        public IActionResult Post([FromBody] string value)
+        public async Task<IActionResult> AddNewAbout(AboutViewModel model)
         {
-            if (!string.IsNullOrEmpty(value))
-            {
-                AboutList.Add(value);
-                return Ok("Successfully");
+            try {
+
+                var newAboutId = await _aboutrepo.AddAboutAsyn(model);
+                var about = await _aboutrepo.GetAboutsAsyn(newAboutId);
+                return about == null ? NotFound() : Ok(about);
+
             }
-
-            return BadRequest();
+            catch
+            {
+                return BadRequest();
+            }
         }
-
-        // PUT api/about/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string value)
+        public async Task<IActionResult> UpdateAbout(int id, AboutViewModel model)
         {
-            if (id >= 0 && id < AboutList.Count && !string.IsNullOrEmpty(value))
+            if(id != model.AboutId)
             {
-                AboutList[id] = value;
-                return Ok("Successfully");
+                return NotFound();
             }
-
-            return NotFound();
+            await _aboutrepo.UpdateAboutAsyn(id, model);
+            return Ok();
         }
-
-        // DELETE api/about/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAbout([FromRoute] int id)
         {
-            if (id >= 0 && id < AboutList.Count)
-            {
-                AboutList.RemoveAt(id);
-                return Ok("Successfully");
-            }
+            await _aboutrepo.DeleteAboutsAsyn(id);
+            return Ok();
 
-            return NotFound();
         }
+
     }
 }
