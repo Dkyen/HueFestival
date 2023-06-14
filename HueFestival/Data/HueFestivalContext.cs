@@ -6,7 +6,6 @@ using HueFestival.Models;
 namespace HueFestival.Data
 {
 	
-	
         public class HueFestivalContext : DbContext
         {
             public HueFestivalContext(DbContextOptions<HueFestivalContext> options)
@@ -29,6 +28,6 @@ namespace HueFestival.Data
             public DbSet<TypeTicket>? TypeTickets { get; set; }
             public DbSet<Userr>? Userrs { get; set; }
         }
-    }
+}
 
 

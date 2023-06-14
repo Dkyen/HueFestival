@@ -1,97 +1,105 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using HueFestival.Data;
 using HueFestival.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HueFestival.Controllers
-
 {
     [Route("api/[controller]")]
     [ApiController]
     public class NewsController : ControllerBase
     {
-        private static List<News> NewsList = new List<News>
-        {
-            new News { NewsId = 1, Title = "News 1", Content = "Noi dung 1", Image = "image1.jpg", CreatedAt = DateTime.Now },
-            new News { NewsId = 2, Title = "News 2", Content = "Noi dung 2", Image = "image2.jpg", CreatedAt = DateTime.Now },
-            // Thêm các dữ liệu tạm thời khác
-        };
+        private readonly HueFestivalContext _context;
 
-        [HttpGet("GetAll")]
-        public IActionResult GetAll()
+        public NewsController(HueFestivalContext context)
         {
-            return Ok(NewsList);
+            _context = context;
         }
 
-        [HttpPost("Add")]
-        public IActionResult Add(News news)
+        // GET: api/news
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<News>>> GetNews()
         {
-            // Kiểm tra dữ liệu hợp lệ
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            news.NewsId = NewsList.Count + 1;
-            news.CreatedAt = DateTime.Now;
-
-            // Thêm tin tức vào danh sách tạm thời
-            NewsList.Add(news);
-
-            return Ok("Successfully");
+            var newsList = await _context.News.ToListAsync();
+            return Ok(newsList);
         }
 
-        [HttpDelete("Delete")]
-        public IActionResult Delete(int id)
+        // GET: api/news/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<News>> GetNewsById(int id)
         {
-            var news = NewsList.Find(n => n.NewsId == id);
+            var news = await _context.News.FindAsync(id);
+
             if (news == null)
             {
                 return NotFound();
             }
 
-            NewsList.Remove(news);
-
-            return Ok("Delete Successfully");
+            return Ok(news);
         }
 
-        [HttpGet("Details")]
-        public IActionResult Details(int id)
+        // POST: api/news
+        [HttpPost]
+        public async Task<ActionResult<News>> CreateNews(News news)
         {
-            var news = NewsList.Find(n => n.NewsId == id);
-            if (news != null)
-            {
-                return Ok(news);
-            }
+            _context.News.Add(news);
+            await _context.SaveChangesAsync();
 
-            return NotFound();
+            return CreatedAtAction(nameof(GetNewsById), new { id = news.NewsId }, news);
         }
 
-        [HttpPut("Edit")]
-        public IActionResult Edit(int id, News updatedNews)
+        // PUT: api/news/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateNews(int id, News news)
         {
-            // Kiểm tra dữ liệu hợp lệ
-            if (!ModelState.IsValid)
+            if (id != news.NewsId)
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
 
-            var news = NewsList.Find(n => n.NewsId == id);
+            _context.Entry(news).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!NewsExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // DELETE: api/news/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNews(int id)
+        {
+            var news = await _context.News.FindAsync(id);
             if (news == null)
             {
                 return NotFound();
             }
 
-            news.Title = updatedNews.Title;
-            news.Content = updatedNews.Content;
-            news.Image = updatedNews.Image;
+            _context.News.Remove(news);
+            await _context.SaveChangesAsync();
 
-            return Ok("Edit Successfully");
+            return NoContent();
+        }
+
+        private bool NewsExists(int id)
+        {
+            return _context.News.Any(e => e.NewsId == id);
         }
     }
-
-   
 }

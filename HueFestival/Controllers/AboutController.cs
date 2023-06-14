@@ -1,77 +1,100 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using HueFestival.Models;
+using HueFestival.Data;
 
 namespace HueFestival.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
-    public class AboutController : Controller
+    public class AboutController : ControllerBase
     {
-        private static List<string> AboutList = new List<string>
-        {
-            "About 1",
-            "About 2"
-            // Thêm các dữ liệu tạm thời khác
-        };
+        private readonly HueFestivalContext _context;
 
-        // GET: api/about
+        public AboutController(HueFestivalContext context)
+        {
+            _context = context;
+        }
+
         [HttpGet]
-        public IActionResult Get()
+        public async Task<ActionResult<IEnumerable<About>>> GetAbouts()
         {
-            return Ok(AboutList);
+            var abouts = await _context.Abouts.ToListAsync();
+            return Ok(abouts);
         }
 
-        // GET api/about/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<ActionResult<About>> GetAbout(int id)
         {
-            if (id >= 0 && id < AboutList.Count)
+            var about = await _context.Abouts.FindAsync(id);
+
+            if (about == null)
             {
-                return Ok(AboutList[id]);
+                return NotFound();
             }
 
-            return NotFound();
+            return about;
         }
 
-        // POST api/about
         [HttpPost]
-        public IActionResult Post([FromBody] string value)
+        public async Task<ActionResult<About>> CreateAbout(About about)
         {
-            if (!string.IsNullOrEmpty(value))
-            {
-                AboutList.Add(value);
-                return Ok("Successfully");
-            }
+            _context.Abouts.Add(about);
+            await _context.SaveChangesAsync();
 
-            return BadRequest();
+            return CreatedAtAction("GetAbout", new { id = about.AboutId }, about);
         }
 
-        // PUT api/about/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string value)
+        public async Task<IActionResult> UpdateAbout(int id, About about)
         {
-            if (id >= 0 && id < AboutList.Count && !string.IsNullOrEmpty(value))
+            if (id != about.AboutId)
             {
-                AboutList[id] = value;
-                return Ok("Successfully");
+                return BadRequest();
             }
 
-            return NotFound();
+            _context.Entry(about).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AboutExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // DELETE api/about/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAbout(int id)
         {
-            if (id >= 0 && id < AboutList.Count)
+            var about = await _context.Abouts.FindAsync(id);
+            if (about == null)
             {
-                AboutList.RemoveAt(id);
-                return Ok("Successfully");
+                return NotFound();
             }
 
-            return NotFound();
+            _context.Abouts.Remove(about);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool AboutExists(int id)
+        {
+            return _context.Abouts.Any(e => e.AboutId == id);
         }
     }
 }
