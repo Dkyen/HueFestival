@@ -18,47 +18,53 @@ namespace HueFestival.Repositories
             _mapper = mapper;
 
         }
-       
-        public async Task<int> AddNewsAsyn(NewsViewModel model)
+
+        public async Task AddAsync(NewsViewModel_Add model)
         {
-            var newNews = _mapper.Map<News>(model);
-            _context.News!.Add(newNews);
+            var news = _mapper.Map<News>(model);
+            _context.News!.Add(news);
             await _context.SaveChangesAsync();
-            return newNews.NewsId;
-        }
-        public async Task DeleteNewsAsyn(int id)
-        {
-            var deleteNews = _context.News!.SingleOrDefault(b => b.NewsId == id);
-            if (deleteNews != null)
-            {
-                _context.News!.Remove(deleteNews);
-                await _context.SaveChangesAsync();
-            }
         }
 
-        public async Task<List<NewsViewModel>> GetAllNewsAsyn()
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var news = await _context.News!.FindAsync(id);
+
+            if (news == null)
+                return false;
+
+            _context.News!.Remove(news);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<NewsViewModel>> GetAllAsync()
         {
             var news = await _context.News!.ToListAsync();
             return _mapper.Map<List<NewsViewModel>>(news);
         }
 
-        public async Task<NewsViewModel> GetNewsAsyn(int id)
+        public async Task<NewsViewModel_Details> GetDetailsAsync(int id)
         {
             var news = await _context.News!.FindAsync(id);
-            return _mapper.Map<NewsViewModel>(news);
+            return _mapper.Map<NewsViewModel_Details>(news);
         }
 
-        public async Task UpdateNewsAsyn(int id, NewsViewModel model)
+        public async Task<bool> UpdateAsync(int id, NewsViewModel_Add mode)
         {
-            if (id == model.NewsId)
-            {
-                var updateNews = _mapper.Map<News>(model);
-                _context.News!.Update(updateNews);
-                await _context.SaveChangesAsync();
+            var news = await _context.News!.FindAsync(id);
 
+            if (news == null)
+                return false;
 
-            }
+            news.Title = mode.Title;
+            news.Content = mode.Content;
+            news.Image = mode.Image;
+            news.CreatedAt = mode.CreatedAt;
+            await _context.SaveChangesAsync();
 
+            return true;
         }
     }
 }

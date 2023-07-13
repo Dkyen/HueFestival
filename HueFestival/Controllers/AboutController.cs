@@ -7,6 +7,8 @@ using HueFestival.Models;
 using HueFestival.Data;
 using HueFestival.Repositories;
 using HueFestival.ViewModel;
+using AutoMapper;
+
 namespace HueFestival.Controllers
 {
     [ApiController]
@@ -14,71 +16,61 @@ namespace HueFestival.Controllers
     public class AboutController : ControllerBase
     {
         private readonly IAboutRepository _aboutrepo;
+        
 
         public AboutController(IAboutRepository repo)
         {
             _aboutrepo = repo;
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllAbouts()
+        [HttpPost("Add")]
+        public async Task<IActionResult> Add(AboutViewModel_Add mode)
         {
-            try
-            {
-                return Ok(await _aboutrepo.GetAllAboutsAsyn());
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
 
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            await _aboutrepo.AddAsync(mode);
+
+            return Ok("Thêm thành công!");
+        }
+         
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (await _aboutrepo.DeleteAsync(id))
+                return Ok("Xoá thành công");
+
+            return BadRequest();
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetAboutById(int id)
-        {
-            var about = await _aboutrepo.GetAboutsAsyn(id);
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll()
+            => Ok(await _aboutrepo.GetAllAsync());
 
-            if (about == null)
-            {
+        [HttpGet("GetDetails")]
+        public async Task<IActionResult> GetDetails(int id)
+        {
+            var result = await _aboutrepo.GetDetailsAsync(id);
+
+            if (result == null)
                 return NotFound();
-            }
 
-            return Ok(about);
+            return Ok(result);
         }
-        [HttpPost]
-        public async Task<IActionResult> AddNewAbout(AboutViewModel model)
+
+        [HttpPut("Edit")]
+        public async Task<IActionResult> Edit(int id, AboutViewModel_Add input)
         {
-            try {
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
 
-                var newAboutId = await _aboutrepo.AddAboutAsyn(model);
-                var about = await _aboutrepo.GetAboutsAsyn(newAboutId);
-                return about == null ? NotFound() : Ok(about);
+            if (await _aboutrepo.UpdateAsync(id, input))
+                return Ok("Cập nhật thành công");
 
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            return BadRequest();
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAbout(int id, AboutViewModel model)
-        {
-            if(id != model.AboutId)
-            {
-                return NotFound();
-            }
-            await _aboutrepo.UpdateAboutAsyn(id, model);
-            return Ok();
-        }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAbout([FromRoute] int id)
-        {
-            await _aboutrepo.DeleteAboutsAsyn(id);
-            return Ok();
-
-        }
-
     }
 }
+    
+
+

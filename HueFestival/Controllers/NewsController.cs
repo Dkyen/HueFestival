@@ -20,66 +20,54 @@ namespace HueFestival.Controllers
             _newsrepo = repo;
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllNewsAsyn()
+        [HttpPost("Add")]
+        public async Task<IActionResult> Add(NewsViewModel_Add mode)
         {
-            try
-            {
-                return Ok(await _newsrepo.GetAllNewsAsyn());
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
 
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            await _newsrepo.AddAsync(mode);
+
+            return Ok("Thêm thành công");
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetNewsById(int id)
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> Delete(int id)
         {
-            var news = await _newsrepo.GetNewsAsyn(id);
+            if (await _newsrepo.DeleteAsync(id))
+                return Ok("Xoá thành công");
 
-            if (news == null)
-            {
+            return BadRequest();
+        }
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll()
+            => Ok(await _newsrepo.GetAllAsync());
+
+        [HttpGet("GetDetails")]
+        public async Task<IActionResult> GetDetails(int id)
+        {
+            var result = await _newsrepo.GetDetailsAsync(id);
+
+            if (result == null)
                 return NotFound();
-            }
 
-            return Ok( news);
+            return Ok(result);
         }
-        [HttpPost]
-        public async Task<IActionResult> AddNewAbout(NewsViewModel model)
+
+        [HttpPut("Edit")]
+        public async Task<IActionResult> Edit(int id, NewsViewModel_Add mode)
         {
-            try
-            {
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
 
-                var newNewsId = await _newsrepo.AddNewsAsyn(model);
-                var news = await _newsrepo.GetNewsAsyn(newNewsId);
-                return news == null ? NotFound() : Ok(news);
+            if (await _newsrepo.UpdateAsync(id, mode))
+                return Ok("Cập nhật thành công");
 
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            return BadRequest();
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateNews(int id, NewsViewModel model)
-        {
-            if (id != model.NewsId)
-            {
-                return NotFound();
-            }
-            await _newsrepo.UpdateNewsAsyn(id, model);
-            return Ok();
-        }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteNews([FromRoute] int id)
-        {
-            await _newsrepo.DeleteNewsAsyn(id);
-            return Ok();
 
-        }
+
 
     }
 }

@@ -19,5 +19,12 @@ namespace HueFestival.Models
 
         [Required]
         public int TypeProgram { get; set; }
+        [Required]
+        public int Type_inoff { get; set; }
+        [Required]
+        public double Price { get; set; }
+
+
+        public List<Event>? ListEvent { get; set; }
     }
 }

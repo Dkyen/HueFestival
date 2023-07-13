@@ -9,6 +9,19 @@ namespace HueFestival.ViewModel
        
         public int AboutId { get; set; }
         public string? Title { get; set; }
+        
+    }
+
+    public class AboutViewModel_Add
+    {
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+    }
+
+    public class AboutViewModel_Details
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
         public string? Content { get; set; }
     }
 }

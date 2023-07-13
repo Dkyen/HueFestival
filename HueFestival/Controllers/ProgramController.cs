@@ -1,114 +1,107 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using HueFestival.Models;
-
-
-
+using HueFestival.Data;
+using HueFestival.Repositories;
+using HueFestival.ViewModel;
+using AutoMapper;
 namespace HueFestival.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ProgramController : ControllerBase
     {
-        private static List<Programme> ProgramList = new List<Programme>
+        private readonly IProgramRepository _programRepo;
+
+        public ProgramController(IProgramRepository programRepo)
         {
-            new Programme { ProgramId = 1, ProgramName = "Program 1", Content = "Chuong trinh 1", TypeProgram = 1 },
-            new Programme { ProgramId = 2, ProgramName = "Program 2", Content = "Chuong trinh 2", TypeProgram = 2 },
-            // Thêm các dữ liệu tạm thời khác
-        };
+            _programRepo = programRepo;
+        }
+
 
         [HttpPost("Add")]
-        public IActionResult Add(Programme programme)
+        public async Task<IActionResult> Add(ProgramViewModel_Add model)
         {
-            // Kiểm tra dữ liệu hợp lệ
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            await _programRepo.AddAsync(model);
 
-            
-            programme.ProgramId = ProgramList.Count + 1;
-
-            // Thêm chương trình vào danh sách tạm thời
-            ProgramList.Add(programme);
-
-            // Trả về thông báo thành công
-            return Ok("Successfully");
+            return Ok("Thêm thành công");
         }
 
         [HttpDelete("Delete")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var program = ProgramList.Find(p => p.ProgramId == id);
-            if (program == null)
+            var result = await _programRepo.DeleteAsync(id);
+
+            switch (result)
             {
-                return NotFound();
+                case 1:
+                    return NotFound();
+                case 2:
+                    return Problem();
+                case 3:
+                    return Ok("Xoá thành công");
+                default:
+                    return NoContent();
             }
-
-            ProgramList.Remove(program);
-
-            // Trả về thông báo thành công
-            return Ok("Successfully");
         }
 
         [HttpGet("TieuDiem")]
-        public IActionResult GetAllTieuDiem()
-        {
-            var tieuDiemPrograms = ProgramList.FindAll(p => p.TypeProgram == 1);
-            return Ok(tieuDiemPrograms);
-        }
+        public async Task<IActionResult> GetAllTieuDiem()
+            => Ok(await _programRepo.GetAllByTypeProgram(1));
 
         [HttpGet("GetAll")]
-        public IActionResult GetAll()
-        {
-            return Ok(ProgramList);
-        }
+        public async Task<IActionResult> GetAll()
+            => Ok(await _programRepo.GetAllAsync());
 
         [HttpGet("CongDong")]
-        public IActionResult GetAllCongDong()
-        {
-            var congDongPrograms = ProgramList.FindAll(p => p.TypeProgram == 3);
-            return Ok(congDongPrograms);
-        }
+        public async Task<IActionResult> GetAllCongDong()
+            => Ok(await _programRepo.GetAllByTypeProgram(3));
 
         [HttpGet("Details")]
-        public IActionResult GetDetails(int id)
+        public async Task<IActionResult> GetDetails(int id)
         {
-            var program = ProgramList.Find(p => p.ProgramId == id);
-            if (program != null)
-            {
-                return Ok(program);
-            }
+            var result = await _programRepo.GetDetailsAsync(id);
+
+            if (result != null)
+                return Ok(result);
 
             return NotFound();
         }
 
         [HttpPut("Edit")]
-        public IActionResult Edit(int id, Programme updatedProgram)
+        public async Task<IActionResult> Edit(int id, ProgramViewModel_Add model)
         {
-            // Kiểm tra dữ liệu hợp lệ
-            if (!ModelState.IsValid)
+            var result = await _programRepo.UpdateAsync(id, model);
+
+            switch (result)
             {
-                return BadRequest(ModelState);
+                case 1:
+                    return NotFound();
+                case 2:
+                    return Problem();
+                case 3:
+                    return Ok("Cập nhật thành công");
+                default:
+                    return NoContent();
             }
-
-            var program = ProgramList.Find(p => p.ProgramId == id);
-            if (program == null)
-            {
-                return NotFound();
-            }
-
-            program.ProgramName = updatedProgram.ProgramName;
-            program.Content = updatedProgram.Content;
-            program.TypeProgram = updatedProgram.TypeProgram;
-
-            // Trả về thông báo thành công
-            return Ok("Successfully");
         }
     }
 
-    
+
+
 }
+
+
+
+        
+
+
+       
+
+       
+       
+
+   

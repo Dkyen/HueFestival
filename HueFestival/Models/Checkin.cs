@@ -14,19 +14,18 @@ namespace HueFestival.Models
 
         [Required]
         public int TicketId { get; set; }
+        public string? UserId { get; set; }
 
         public bool? Status { get; set; }
 
-        public DateTime? CreatedAt { get; set; }
-
-        [Required]
-        public int AccountId { get; set; }
-
-        [ForeignKey("AccountId")]
-        public Account? Account { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [ForeignKey("TicketId")]
         public Ticket? Ticket { get; set; }
+
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+
     }
 }
 

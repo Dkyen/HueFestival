@@ -44,34 +44,6 @@ namespace HueFestival.Migrations
                     b.ToTable("About");
                 });
 
-            modelBuilder.Entity("HueFestival.Models.Account", b =>
-                {
-                    b.Property<int>("AccountId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccountId"), 1L, 1);
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("AccountId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("Account");
-                });
-
             modelBuilder.Entity("HueFestival.Models.Checkin", b =>
                 {
                     b.Property<int>("CheckinId")
@@ -80,10 +52,7 @@ namespace HueFestival.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CheckinId"), 1L, 1);
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool?>("Status")
@@ -92,11 +61,14 @@ namespace HueFestival.Migrations
                     b.Property<int>("TicketId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("CheckinId");
 
-                    b.HasIndex("AccountId");
-
                     b.HasIndex("TicketId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Checkin");
                 });
@@ -175,9 +147,10 @@ namespace HueFestival.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("LocationCategoryId")
+                        .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<string>("Longitude")
+                    b.Property<string>("Longtitude")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -241,35 +214,6 @@ namespace HueFestival.Migrations
                     b.ToTable("News");
                 });
 
-            modelBuilder.Entity("HueFestival.Models.PriceTicket", b =>
-                {
-                    b.Property<int>("PriceTicketId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PriceTicketId"), 1L, 1);
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberSlot")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("TypeTicketId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PriceTicketId");
-
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("TypeTicketId");
-
-                    b.ToTable("PriceTicket");
-                });
-
             modelBuilder.Entity("HueFestival.Models.Programme", b =>
                 {
                     b.Property<int>("ProgramId")
@@ -281,6 +225,9 @@ namespace HueFestival.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
                     b.Property<string>("ProgramName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -288,26 +235,12 @@ namespace HueFestival.Migrations
                     b.Property<int>("TypeProgram")
                         .HasColumnType("int");
 
+                    b.Property<int>("Type_inoff")
+                        .HasColumnType("int");
+
                     b.HasKey("ProgramId");
 
                     b.ToTable("Programme");
-                });
-
-            modelBuilder.Entity("HueFestival.Models.Role", b =>
-                {
-                    b.Property<int>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("HueFestival.Models.Ticket", b =>
@@ -321,24 +254,17 @@ namespace HueFestival.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
                     b.Property<string>("TicketNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TypeTicketId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("TicketId");
 
@@ -387,7 +313,7 @@ namespace HueFestival.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeTicketId"), 1L, 1);
 
-                    b.Property<int?>("EventId")
+                    b.Property<int>("EventId")
                         .HasColumnType("int");
 
                     b.Property<double>("Price")
@@ -407,87 +333,65 @@ namespace HueFestival.Migrations
                     b.ToTable("TypeTicket");
                 });
 
-            modelBuilder.Entity("HueFestival.Models.Userr", b =>
+            modelBuilder.Entity("HueFestival.Models.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<string>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
-
-                    b.Property<int?>("AccountId")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Userr");
-                });
-
-            modelBuilder.Entity("HueFestival.Models.Account", b =>
-                {
-                    b.HasOne("HueFestival.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId");
-
-                    b.Navigation("Role");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("HueFestival.Models.Checkin", b =>
                 {
-                    b.HasOne("HueFestival.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HueFestival.Models.Ticket", "Ticket")
                         .WithMany()
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Account");
+                    b.HasOne("HueFestival.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Ticket");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HueFestival.Models.Event", b =>
                 {
                     b.HasOne("HueFestival.Models.EventCategory", "EventCategory")
-                        .WithMany()
+                        .WithMany("ListEvent")
                         .HasForeignKey("EventCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HueFestival.Models.Location", "Location")
-                        .WithMany()
+                        .WithMany("ListEvent")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HueFestival.Models.Programme", "Program")
-                        .WithMany()
+                    b.HasOne("HueFestival.Models.Programme", "Programme")
+                        .WithMany("ListEvent")
                         .HasForeignKey("ProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -496,35 +400,18 @@ namespace HueFestival.Migrations
 
                     b.Navigation("Location");
 
-                    b.Navigation("Program");
+                    b.Navigation("Programme");
                 });
 
             modelBuilder.Entity("HueFestival.Models.Location", b =>
                 {
                     b.HasOne("HueFestival.Models.LocationCategory", "LocationCategory")
-                        .WithMany()
-                        .HasForeignKey("LocationCategoryId");
+                        .WithMany("ListLocation")
+                        .HasForeignKey("LocationCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("LocationCategory");
-                });
-
-            modelBuilder.Entity("HueFestival.Models.PriceTicket", b =>
-                {
-                    b.HasOne("HueFestival.Models.Event", "Event")
-                        .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HueFestival.Models.TypeTicket", "TypeTicket")
-                        .WithMany()
-                        .HasForeignKey("TypeTicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("TypeTicket");
                 });
 
             modelBuilder.Entity("HueFestival.Models.Ticket", b =>
@@ -535,33 +422,44 @@ namespace HueFestival.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HueFestival.Models.Userr", "Userr")
+                    b.HasOne("HueFestival.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("TypeTicket");
 
-                    b.Navigation("Userr");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HueFestival.Models.TypeTicket", b =>
                 {
                     b.HasOne("HueFestival.Models.Event", "Event")
                         .WithMany()
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("HueFestival.Models.Userr", b =>
+            modelBuilder.Entity("HueFestival.Models.EventCategory", b =>
                 {
-                    b.HasOne("HueFestival.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId");
+                    b.Navigation("ListEvent");
+                });
 
-                    b.Navigation("Account");
+            modelBuilder.Entity("HueFestival.Models.Location", b =>
+                {
+                    b.Navigation("ListEvent");
+                });
+
+            modelBuilder.Entity("HueFestival.Models.LocationCategory", b =>
+                {
+                    b.Navigation("ListLocation");
+                });
+
+            modelBuilder.Entity("HueFestival.Models.Programme", b =>
+                {
+                    b.Navigation("ListEvent");
                 });
 #pragma warning restore 612, 618
         }

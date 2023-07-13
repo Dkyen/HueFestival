@@ -23,6 +23,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.16" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.16.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="QRCoder" Version="1.4.3" />
+    <PackageReference Include="System.Security.Claims" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,17 +35,19 @@
     <None Remove="Models\" />
     <None Remove="Migrations\" />
     <None Remove="ViewModel\" />
-    <None Remove="Repositories\" />
     <None Remove="Helper\" />
-    <None Remove="Services\" />
+    <None Remove="Filters\" />
+    <None Remove="IRepositories\" />
+    <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Models\" />
     <Folder Include="Migrations\" />
     <Folder Include="ViewModel\" />
-    <Folder Include="Repositories\" />
     <Folder Include="Helper\" />
-    <Folder Include="Services\" />
+    <Folder Include="Filters\" />
+    <Folder Include="IRepositories\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 </Project>

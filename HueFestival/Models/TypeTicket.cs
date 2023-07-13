@@ -12,7 +12,8 @@ namespace HueFestival.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int TypeTicketId { get; set; }
 
-        public int? EventId { get; set; }
+        public int EventId { get; set; }
+        public Event? Event { get; set; }
 
         [Required]
         public string? Type { get; set; }
@@ -21,7 +22,6 @@ namespace HueFestival.Models
 
         public int Quantity { get; set; }
 
-        [ForeignKey("EventId")]
-        public Event? Event { get; set; }
+       
     }
 }

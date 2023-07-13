@@ -8,8 +8,9 @@ namespace HueFestival.Models
     public class Location
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LocationId { get; set; }
-
+        [Required]
         public int? LocationCategoryId { get; set; }
 
         [Required]
@@ -21,12 +22,14 @@ namespace HueFestival.Models
         public string? Image { get; set; }
 
         [Required]
-        public string? Longitude { get; set; }
+        public string? Longtitude { get; set; }
 
         [Required]
         public string? Latitude { get; set; }
 
         [ForeignKey("LocationCategoryId")]
         public LocationCategory? LocationCategory { get; set; }
+
+        public List<Event>? ListEvent { get; set; }
     }
 }

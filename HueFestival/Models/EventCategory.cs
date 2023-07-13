@@ -16,5 +16,7 @@ namespace HueFestival.Models
         public string? EventName { get; set; }
 
         public string? Content { get; set; }
+
+        public List<Event>? ListEvent { get; set; }
     }
 }

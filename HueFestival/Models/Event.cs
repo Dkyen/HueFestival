@@ -27,7 +27,7 @@ namespace HueFestival.Models
         public int EventCategoryId { get; set; }
 
         [ForeignKey("ProgramId")]
-        public Programme? Program { get; set; }
+        public Programme? Programme { get; set; }
 
         [ForeignKey("LocationId")]
         public Location? Location { get; set; }

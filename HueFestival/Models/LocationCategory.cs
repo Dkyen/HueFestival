@@ -17,5 +17,7 @@ namespace HueFestival.Models
 
         [Required]
         public string? Image { get; set; }
+
+        public List<Location>? ListLocation { get; set; }
     }
 }

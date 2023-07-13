@@ -2,8 +2,10 @@
 using HueFestival.ViewModel;
 using HueFestival.Data;
 using HueFestival.Models;
+using HueFestival.IRepositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using static QRCoder.PayloadGenerator.SwissQrCode;
 
 namespace HueFestival.Repositories
 {
@@ -19,50 +21,51 @@ namespace HueFestival.Repositories
 
         }
 
-        public async Task<int> AddAboutAsyn(AboutViewModel model)
+        public async Task AddAsync(AboutViewModel_Add model)
         {
-            var newAbout = _mapper.Map<About>(model);
-            _context.Abouts!.Add(newAbout);
+            var about = _mapper.Map<About>(model);
+            _context.Abouts!.Add(about);
             await _context.SaveChangesAsync();
-            return newAbout.AboutId;
         }
 
-        public async Task DeleteAboutsAsyn(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var deleteAbout = _context.Abouts!.SingleOrDefault(b => b.AboutId == id);
-            if (deleteAbout != null)
-            {
-                _context.Abouts!.Remove(deleteAbout);
-                await _context.SaveChangesAsync();
-            }
+            var about = await _context.Abouts!.FindAsync(id);
+
+            if (about == null)
+                return false;
+
+            _context.Abouts!.Remove(about);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public async Task<List<AboutViewModel>> GetAllAboutsAsyn()
+        public async Task<List<AboutViewModel>> GetAllAsync()
         {
             var abouts = await _context.Abouts!.ToListAsync();
             return _mapper.Map<List<AboutViewModel>>(abouts);
         }
 
-        public async Task<AboutViewModel> GetAboutsAsyn(int id)
+        public async Task<AboutViewModel_Details> GetDetailsAsync(int id)
         {
             var about = await _context.Abouts!.FindAsync(id);
-            return _mapper.Map<AboutViewModel>(about);
+            return _mapper.Map<AboutViewModel_Details>(about);
         }
 
-        public async Task UpdateAboutAsyn (int id, AboutViewModel model)
+        public async Task<bool> UpdateAsync(int id, AboutViewModel_Add input)
         {
-            if (id == model.AboutId)
-            {
-                var updateAbout = _mapper.Map<About>(model);
-                _context.Abouts!.Update(updateAbout);
-                await _context.SaveChangesAsync();
+            var about = await _context.Abouts!.FindAsync(id);
 
+            if (about == null)
+                return false;
 
-            }
+            about.Title = input.Title;
+            about.Content = input.Content;
 
+            await _context.SaveChangesAsync();
+
+            return true;
         }
-
-        
     }
-
 }
